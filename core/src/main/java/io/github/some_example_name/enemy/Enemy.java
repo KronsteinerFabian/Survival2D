@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import io.github.some_example_name.AttackType;
 import io.github.some_example_name.Entity;
 import io.github.some_example_name.Facing;
 
@@ -55,15 +56,17 @@ public class Enemy extends Entity {
 
     public boolean attack() {
         boolean firstAttack;
-        if(secondsSinceLastAttack==0f)
-            firstAttack=true;
-        else
-            firstAttack=false;
-
+        if (secondsSinceLastAttack == 0f) {
+            enemyAnimator.updateAttackTpye(AttackType.ATTACKING);
+            firstAttack = true;
+        } else {
+            firstAttack = false;
+        }
         secondsSinceLastAttack += Gdx.graphics.getDeltaTime();
 
         if (secondsSinceLastAttack >= secondsBetweenAttacks) {
             secondsSinceLastAttack = 0f;
+            enemyAnimator.updateAttackTpye(AttackType.ATTACKING);
             return true;
         }
 

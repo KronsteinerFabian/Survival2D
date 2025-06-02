@@ -30,7 +30,7 @@ public class EnemySpawner {
             System.out.println("spawn");
             EnemyAnimator enemyAnimator = new EnemyAnimator();
             enemyAnimator.create();
-            Enemy enemy = new Enemy(playerX+ 70,playerY+70);
+            Enemy enemy = new Enemy(playerX+ 100,playerY+100);
             enemy.setEnemyAnimator(enemyAnimator);
             enemies.add(enemy);
 
