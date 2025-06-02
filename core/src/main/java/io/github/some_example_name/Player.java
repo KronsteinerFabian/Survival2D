@@ -27,6 +27,7 @@ public class Player extends Entity {
     private float hitY=-50;
     private int hitWidth=100;
     private Rectangle hitRectangle;
+    private double health = 6;
 
 
     public Player() {
@@ -56,6 +57,14 @@ public class Player extends Entity {
 
 
         // System.out.println(x+" "+y);
+    }
+
+    public boolean takeDamage(){//true if dead
+        health-=0.5;
+        if(health<=0)
+            return true;
+
+        return false;
     }
 
     public void renderHitBox(Matrix4 matrix4){
@@ -269,5 +278,9 @@ public class Player extends Entity {
 
     public void resetHitRectangle(){
         hitRectangle=null;
+    }
+
+    public double getHealth(){
+        return health;
     }
 }

@@ -149,7 +149,7 @@ public class Main extends ApplicationAdapter {
 
         batch.setProjectionMatrix(uiMatrix);
         batch.begin();
-        font.draw(batch, "Leben: 100 Punkte: "+kills , 20, font.getXHeight()+20);
+        font.draw(batch, "Leben: "+player.getHealth()+" Punkte: "+kills , 20, font.getXHeight()+20);
         if (paused)
             font.draw(batch,"Paused",Gdx.graphics.getWidth()/2-150/2,Gdx.graphics.getHeight()/2+font.getXHeight()/2);
 
@@ -195,6 +195,10 @@ public class Main extends ApplicationAdapter {
 
         enemySpawner.updatePositions(player.x, player.y);
         enemySpawner.updateSpawning(player.x, player.y);
+        enemySpawner.checkAttackBoxes(player);
+
+        if(player.getHealth()<=0)
+            paused=true;
 
 
         //System.out.println(player.hitbox.overlaps(enemy.hitbox));

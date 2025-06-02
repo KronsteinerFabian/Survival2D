@@ -2,6 +2,7 @@ package io.github.some_example_name.enemy;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
+import io.github.some_example_name.Player;
 
 import java.awt.*;
 import java.util.Collection;
@@ -29,7 +30,7 @@ public class EnemySpawner {
             System.out.println("spawn");
             EnemyAnimator enemyAnimator = new EnemyAnimator();
             enemyAnimator.create();
-            Enemy enemy = new Enemy(playerX+ 30,playerY+30);
+            Enemy enemy = new Enemy(playerX+ 70,playerY+70);
             enemy.setEnemyAnimator(enemyAnimator);
             enemies.add(enemy);
 
@@ -44,7 +45,7 @@ public class EnemySpawner {
         while (enemyIterator.hasNext()){
             e = enemyIterator.next();
             if (e.hitbox.overlaps(hitRectangle)) {
-                System.out.println("took damage!!!w");
+                System.out.println("took damage!!!");
                 if (e.takeDamage()) {
                     kills++;
                     enemyIterator.remove();
@@ -62,5 +63,14 @@ public class EnemySpawner {
 
     public Collection<Enemy> getEnemies(){
         return enemies;
+    }
+
+    public void checkAttackBoxes(Player player){
+        for (Enemy e: enemies){
+            if(player.hitbox.overlaps(e.attackBox)){
+                if (e.attack())
+                    player.takeDamage();
+            }
+        }
     }
 }
