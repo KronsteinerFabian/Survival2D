@@ -36,6 +36,7 @@ public class EnemyAnimator implements ApplicationListener {
 
     private TextureRegion[] attackLeftFrames;
     private Animation<TextureRegion> attackLeftAnimation;
+
     private AttackType attackType = AttackType.NONE;
     private Facing facing = Facing.STANDING;
 
@@ -47,12 +48,17 @@ public class EnemyAnimator implements ApplicationListener {
 
     private static float SIZEING = 5f;
 
-
     private static final int FRAME_COLS = 9, FRAME_ROWS = 7;
     private TextureRegion currFrame = new TextureRegion();
-    Animation<TextureRegion> wholeAnimation; // Must declare frame type (TextureRegion)
-    Texture walkSheet;
-    float stateTime;
+    private Animation<TextureRegion> wholeAnimation; // Gesamte Animation
+    private Texture walkSheet;
+    private float stateTime;
+
+    // Konstruktor: initialisiert AttackType und StateTime sauber
+    public EnemyAnimator() {
+        attackType = AttackType.NONE;
+        stateTime = 0f;
+    }
 
     @Override
     public void create() {
@@ -106,8 +112,8 @@ public class EnemyAnimator implements ApplicationListener {
         attackFrontFrames = attackRightFrames;
         attackBackFrames = attackRightFrames;
 
-        // Initialize the Animation with the frame interval and array of frames
-        wholeAnimation = new Animation<TextureRegion>(0.7f, wholeFrames);
+        // Animationen initialisieren (frame duration ist 0.2f)
+        wholeAnimation = new Animation<>(0.7f, wholeFrames);
         standingAnimation = new Animation<>(0.2f, standingFrames);
         walkingRightAnimation = new Animation<>(0.2f, walkingRightFrames);
         walkingLeftAnimation = new Animation<>(0.2f, walkingLeftFrames);
@@ -119,24 +125,17 @@ public class EnemyAnimator implements ApplicationListener {
         attackLeftAnimation = new Animation<>(0.2f, attackLeftFrames);
         attackRightAnimation = new Animation<>(0.2f, attackRightFrames);
 
-        // Instantiate a SpriteBatch for drawing and reset the elapsed animation
-        // time to 0
         stateTime = 0f;
 
         frame_HEIGHT = standingFrames[0].getRegionHeight() * SIZEING;
         frame_WIDTH = standingFrames[0].getRegionWidth() * SIZEING;
-
     }
 
     @Override
-    public void resize(int width, int height) {
-
-    }
+    public void resize(int width, int height) {}
 
     @Override
-    public void render() {
-
-    }
+    public void render() {}
 
     public float getFrame_WIDTH() {
         return frame_WIDTH;
@@ -146,27 +145,17 @@ public class EnemyAnimator implements ApplicationListener {
         return frame_HEIGHT;
     }
 
-
     public void updatePosition(float x, float y) {
-
         xPos = x - (frame_HEIGHT / 2);
         yPos = y - (frame_WIDTH / 2);
     }
 
     public void render(SpriteBatch spriteBatch) {
-        stateTime += Gdx.graphics.getDeltaTime(); // Accumulate elapsed animation time
-        TextureRegion currentFrame = new TextureRegion();
+        stateTime += Gdx.graphics.getDeltaTime(); // Zeit inkrementieren
 
-        // Get current frame of animation for the current stateTime
-        //TextureRegion currentFrame = walkAnimation.getKeyFrame(stateTime, true);
-        //TextureRegion currentFrame = standingAnimation.getKeyFrame(stateTime, true);
-        //TextureRegion currentFrame = walkingLeftAnimation.getKeyFrame(stateTime, true);
-        //TextureRegion currentFrame = walkingRightAnimation.getKeyFrame(stateTime, true);
-        //TextureRegion currentFrame = walkingDownAnimation.getKeyFrame(stateTime, true);
-        //TextureRegion currentFrame = walkingUpAnimation.getKeyFrame(stateTime, true);
+        TextureRegion currentFrame;
 
         if (attackType == AttackType.NONE) {
-
             switch (facing) {
                 case STANDING:
                     currentFrame = standingAnimation.getKeyFrame(stateTime, true);
@@ -183,9 +172,12 @@ public class EnemyAnimator implements ApplicationListener {
                 case UP:
                     currentFrame = walkingUpAnimation.getKeyFrame(stateTime, true);
                     break;
+                default:
+                    currentFrame = standingAnimation.getKeyFrame(stateTime, true);
+                    break;
             }
-
         } else {
+            // Attack Animationen ohne Loop (false)
             switch (facing) {
                 case STANDING:
                     currentFrame = attackFrontAnimation.getKeyFrame(stateTime, false);
@@ -193,16 +185,13 @@ public class EnemyAnimator implements ApplicationListener {
                         attackType = AttackType.NONE;
                         stateTime = 0f;
                     }
-
                     break;
-
                 case LEFT:
                     currentFrame = attackLeftAnimation.getKeyFrame(stateTime, false);
                     if (attackLeftAnimation.isAnimationFinished(stateTime)) {
                         attackType = AttackType.NONE;
                         stateTime = 0f;
                     }
-
                     break;
                 case RIGHT:
                     currentFrame = attackRightAnimation.getKeyFrame(stateTime, false);
@@ -210,7 +199,6 @@ public class EnemyAnimator implements ApplicationListener {
                         attackType = AttackType.NONE;
                         stateTime = 0f;
                     }
-
                     break;
                 case DOWN:
                     currentFrame = attackFrontAnimation.getKeyFrame(stateTime, false);
@@ -218,7 +206,6 @@ public class EnemyAnimator implements ApplicationListener {
                         attackType = AttackType.NONE;
                         stateTime = 0f;
                     }
-
                     break;
                 case UP:
                     currentFrame = attackBackAnimation.getKeyFrame(stateTime, false);
@@ -226,20 +213,30 @@ public class EnemyAnimator implements ApplicationListener {
                         attackType = AttackType.NONE;
                         stateTime = 0f;
                     }
-
+                    break;
+                default:
+                    currentFrame = attackFrontAnimation.getKeyFrame(stateTime, false);
+                    if (attackFrontAnimation.isAnimationFinished(stateTime)) {
+                        attackType = AttackType.NONE;
+                        stateTime = 0f;
+                    }
                     break;
             }
         }
 
-        spriteBatch.draw(currentFrame, xPos, yPos, frame_WIDTH, frame_HEIGHT); // Draw current frame at (50, 50)
+        spriteBatch.draw(currentFrame, xPos, yPos, frame_WIDTH, frame_HEIGHT);
     }
 
     public void updateFacing(Facing facing) {
         this.facing = facing;
     }
 
-    public void updateAttackTpye(AttackType attackType) {
-        this.attackType = attackType;
+    // Wichtig: StateTime wird hier zurückgesetzt, wenn sich der AttackType ändert
+    public void updateAttackType(AttackType newAttackType) {
+        if (this.attackType != newAttackType) {
+            this.attackType = newAttackType;
+            this.stateTime = 0f;  // Reset der Animationszeit, damit Angriff neu startet
+        }
     }
 
     public static float getSIZEING() {
@@ -247,17 +244,13 @@ public class EnemyAnimator implements ApplicationListener {
     }
 
     @Override
-    public void pause() {
-
-    }
+    public void pause() {}
 
     @Override
-    public void resume() {
-
-    }
+    public void resume() {}
 
     @Override
-    public void dispose() { // SpriteBatches and Textures must always be disposed
+    public void dispose() {
         walkSheet.dispose();
 
         standingFrames = null;
@@ -280,7 +273,9 @@ public class EnemyAnimator implements ApplicationListener {
         attackBackAnimation = null;
         attackLeftAnimation = null;
         attackRightAnimation = null;
+    }
 
+    public AttackType getAttackType() {
+        return attackType;
     }
 }
-

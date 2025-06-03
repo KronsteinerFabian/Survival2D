@@ -14,6 +14,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -160,7 +161,7 @@ public class GameScreen implements Screen {
         //Shaperenders
         player.render(cam);
         player.renderHitBox(uiMatrix);
-        enemy.render(cam);
+//        enemy.render(cam);
     }
 
     @Override
@@ -195,7 +196,7 @@ public class GameScreen implements Screen {
         }
 
         entities.add(player);
-        entities.add(enemy);
+//        entities.add(enemy);
         //System.out.println("\t"+entities.size());
         for (Entity e : entities){
             e.renderAnimation(batch);
@@ -211,9 +212,9 @@ public class GameScreen implements Screen {
 
     public void update() {
         handleInput();
-        if (!player.hitbox.overlaps(enemy.hitbox)) {
-            enemy.moveToPlayer(player.x, player.y);
-        }
+//        if (!player.hitbox.overlaps(enemy.hitbox)) {
+//            enemy.moveToPlayer(player.x, player.y);
+//        }
 
 
         enemySpawner.updatePositions(player.x, player.y);
@@ -237,8 +238,8 @@ public class GameScreen implements Screen {
         if (Gdx.input.justTouched()){
             player.hit(Gdx.input.getX(),Gdx.input.getY());
 
-            if (player.getHitRectangle().overlaps(enemy.hitbox))
-                System.out.println("hit");
+//            if (player.getHitRectangle().overlaps(enemy.hitbox))
+//                System.out.println("hit");
 
             kills+=enemySpawner.checkHits(player.getHitRectangle());
         }
@@ -278,7 +279,7 @@ public class GameScreen implements Screen {
         player.moveDirection(x, y);
 
 
-        //cam.zoom = MathUtils.clamp(cam.zoom, 0.1f, 500 / cam.viewportWidth);
+        cam.zoom = MathUtils.clamp(cam.zoom, 0.3f, 1);
 
         float effectiveViewportWidth = cam.viewportWidth * cam.zoom;
         float effectiveViewportHeight = cam.viewportHeight * cam.zoom;

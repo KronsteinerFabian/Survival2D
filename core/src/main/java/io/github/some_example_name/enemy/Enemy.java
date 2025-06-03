@@ -33,6 +33,9 @@ public class Enemy extends Entity {
     private float secondsSinceLastAttack = 0;
     private double secondsBetweenAttacks = 4;
     private Music swordHit= Gdx.audio.newMusic(Gdx.files.internal("sounds/sword-hit.mp3"));
+    private boolean isAttacking = false;
+    private float attackStateTime = 0f;
+    private final float attackDuration = 4f; // z.B. halbe Sekunde Attackanimation
 
 
     public Enemy() {
@@ -56,29 +59,59 @@ public class Enemy extends Entity {
         this.tiledMapTileLayer = tiledMapTileLayer;
     }
 
+//    public boolean attack() {
+//        boolean firstAttack;
+//        if (secondsSinceLastAttack == 0f) {
+//            enemyAnimator.updateAttackTpye(AttackType.ATTACKING);
+//            swordHit.stop();
+//            swordHit.play();
+//            firstAttack = true;
+//        } else {
+//            firstAttack = false;
+//        }
+//        secondsSinceLastAttack += Gdx.graphics.getDeltaTime();
+//
+//        if (secondsSinceLastAttack >= secondsBetweenAttacks) {
+//            secondsSinceLastAttack = 0f;
+//            enemyAnimator.updateAttackTpye(AttackType.ATTACKING);
+//            swordHit.stop();
+//            swordHit.play();
+//            return true;
+//        }
+//
+//
+//        return firstAttack;
+//    }
+
+
+
     public boolean attack() {
-        boolean firstAttack;
-        if (secondsSinceLastAttack == 0f) {
-            enemyAnimator.updateAttackTpye(AttackType.ATTACKING);
+        float delta = Gdx.graphics.getDeltaTime();
+
+        if (!isAttacking) {
+            // Starte Angriff, wenn nicht gerade am Angreifen
+            isAttacking = true;
+            attackStateTime = 0f;
+            enemyAnimator.updateAttackType(AttackType.ATTACKING);
             swordHit.stop();
             swordHit.play();
-            firstAttack = true;
+            return true;  // Angriff startet jetzt
         } else {
-            firstAttack = false;
+            // Angriff läuft noch
+            attackStateTime += delta;
+
+            if (attackStateTime >= attackDuration) {
+                // Angriff vorbei
+                isAttacking = false;
+                enemyAnimator.updateAttackType(AttackType.NONE);
+                return false; // Angriff beendet
+            } else {
+                // Angriff läuft weiter, keine neue Attacke erlauben
+                return false;
+            }
         }
-        secondsSinceLastAttack += Gdx.graphics.getDeltaTime();
-
-        if (secondsSinceLastAttack >= secondsBetweenAttacks) {
-            secondsSinceLastAttack = 0f;
-            enemyAnimator.updateAttackTpye(AttackType.ATTACKING);
-            swordHit.stop();
-            swordHit.play();
-            return true;
-        }
-
-
-        return firstAttack;
     }
+
 
 
     public void render(OrthographicCamera cam) {
@@ -214,6 +247,11 @@ public class Enemy extends Entity {
             if (velocity > 0) velocity = 0;
         }
         return velocity;
+    }
+
+
+    public void dispose(){
+        enemyAnimator.dispose();
     }
 
 
