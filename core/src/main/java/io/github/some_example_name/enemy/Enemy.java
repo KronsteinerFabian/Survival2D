@@ -1,6 +1,7 @@
 package io.github.some_example_name.enemy;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -31,6 +32,7 @@ public class Enemy extends Entity {
     private double health = 4;
     private float secondsSinceLastAttack = 0;
     private double secondsBetweenAttacks = 4;
+    private Music swordHit= Gdx.audio.newMusic(Gdx.files.internal("sounds/sword-hit.mp3"));
 
 
     public Enemy() {
@@ -58,6 +60,8 @@ public class Enemy extends Entity {
         boolean firstAttack;
         if (secondsSinceLastAttack == 0f) {
             enemyAnimator.updateAttackTpye(AttackType.ATTACKING);
+            swordHit.stop();
+            swordHit.play();
             firstAttack = true;
         } else {
             firstAttack = false;
@@ -67,6 +71,8 @@ public class Enemy extends Entity {
         if (secondsSinceLastAttack >= secondsBetweenAttacks) {
             secondsSinceLastAttack = 0f;
             enemyAnimator.updateAttackTpye(AttackType.ATTACKING);
+            swordHit.stop();
+            swordHit.play();
             return true;
         }
 

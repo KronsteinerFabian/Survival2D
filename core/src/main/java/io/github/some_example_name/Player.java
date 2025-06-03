@@ -1,6 +1,7 @@
 package io.github.some_example_name;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -28,12 +29,14 @@ public class Player extends Entity {
     private int hitWidth=100;
     private Rectangle hitRectangle;
     private double health = 6;
+    private Music swordSound;
 
 
     public Player() {
         shapeRenderer = new ShapeRenderer();
         x=2000;
         y=2000;
+        swordSound = Gdx.audio.newMusic(Gdx.files.internal("sounds/sword-clash.mp3"));
         //playerAnimator = new PlayerAnimator();
     }
 
@@ -91,6 +94,8 @@ public class Player extends Entity {
     }
 
     public void hit(int hitX, int hitY){ //hitY 0 ist ganz oben, nicht wie bei zb. font rendern
+        swordSound.stop();
+        swordSound.play();
         System.out.println(hitX+" "+hitY);
 
 
@@ -237,7 +242,17 @@ public class Player extends Entity {
 
     private void updateAnimation() {
         if (hitX>=0 && hitY>=0){
-            playerAnimator.updateAttack(AttackType.ATTACKING);
+            AttackType attackType=AttackType.ATTACKING;
+            if (hitRectangle.x+hitRectangle.width/2>x)
+                attackType=AttackType.RIGHT;
+            else if (hitRectangle.x+hitRectangle.width/2<x)
+                attackType=AttackType.LEFT;
+            else if(hitRectangle.y+hitRectangle.width/2>y)
+                attackType=AttackType.UP;
+            else if(hitRectangle.y+hitRectangle.width/2<y)
+                attackType=AttackType.DOWN;
+
+            playerAnimator.updateAttack(attackType);
         }else {
 
             if (current_velocityX == 0 && current_velocityY == 0) {

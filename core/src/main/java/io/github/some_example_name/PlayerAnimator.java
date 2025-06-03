@@ -198,15 +198,7 @@ public class PlayerAnimator implements ApplicationListener{
             }
 
         }else {
-            switch (facing) {
-                case STANDING:
-                    currentFrame = attackFrontAnimation.getKeyFrame(stateTime,false);
-                    if(attackFrontAnimation.isAnimationFinished(stateTime)) {
-                        attackType = AttackType.NONE;
-                        stateTime = 0f;
-                    }
-
-                    break;
+            switch (attackType) {
 
                 case LEFT:
                     currentFrame = attackLeftAnimation.getKeyFrame(stateTime,false);
@@ -235,6 +227,15 @@ public class PlayerAnimator implements ApplicationListener{
                 case UP:
                     currentFrame = attackBackAnimation.getKeyFrame(stateTime,false);
                     if(attackBackAnimation.isAnimationFinished(stateTime)) {
+                        attackType = AttackType.NONE;
+                        stateTime = 0f;
+                    }
+
+                    break;
+
+                default:
+                    currentFrame = attackRightAnimation.getKeyFrame(stateTime,false);
+                    if(attackRightAnimation.isAnimationFinished(stateTime)) {
                         attackType = AttackType.NONE;
                         stateTime = 0f;
                     }

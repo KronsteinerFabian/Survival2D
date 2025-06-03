@@ -33,7 +33,7 @@ import java.util.TreeSet;
 public class GameScreen implements Screen {
     private final Main main;
 
-    private boolean paused=false;
+    private boolean gameOver=true;
     private SpriteBatch batch;
     private Player player;
     private OrthographicCamera cam;
@@ -131,14 +131,10 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
         //world.step(1 / 60f, 6, 2);
-        if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
-            mainMusic.pause();
-            main.setScreen(new PauseScreen(main, this));
-            //paused=!paused;
-        }
 
-        if (!paused)
-            update();
+
+
+        update();
 
 
 
@@ -156,8 +152,8 @@ public class GameScreen implements Screen {
         batch.setProjectionMatrix(uiMatrix);
         batch.begin();
         font.draw(batch, "Leben: "+player.getHealth()+" Punkte: "+kills , 20, font.getXHeight()+20);
-        if (paused)
-            font.draw(batch,"Paused",Gdx.graphics.getWidth()/2-150/2,Gdx.graphics.getHeight()/2+font.getXHeight()/2);
+//        if (paused)
+//            font.draw(batch,"Paused",Gdx.graphics.getWidth()/2-150/2,Gdx.graphics.getHeight()/2+font.getXHeight()/2);
 
         batch.end();
 
@@ -224,8 +220,11 @@ public class GameScreen implements Screen {
         enemySpawner.updateSpawning(player.x, player.y);
         enemySpawner.checkAttackBoxes(player);
 
-        if(player.getHealth()<=0)
-            paused=true;
+        if(player.getHealth()<=0) {
+            gameOver = true;
+            mainMusic.stop();
+            main.setScreen(new MainMenuScreen(main));
+        }
 
 
         //System.out.println(player.hitbox.overlaps(enemy.hitbox));
@@ -270,8 +269,9 @@ public class GameScreen implements Screen {
             //player.move(0,VELOCITY);
             y = 1;
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
-            Gdx.app.exit();
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            mainMusic.pause();
+            main.setScreen(new PauseScreen(main, this));
         }
 
 
